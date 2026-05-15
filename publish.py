@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-publish.py — nahraje markdown článek jako draft do Blog API.
+publish.py — nahraje markdown article jako draft do Blog API.
 
-Použití:
+Usage:
     python publish.py articles/2026-03-21-nazev-clanku-cs.md
 
-Nastavení:
-    Vytvoř soubor .env v této složce s obsahem:
-        BLOG_API_TOKEN=tvůj_api_token
-        CYRCID_AUTHOR_ID=id_tvého_autora   (volitelné, výchozí: 1)
+Setup:
+    Create a .env file in this directory with:
+        BLOG_API_TOKEN=your_api_token
+        AUTHOR_ID=your_author_id   (optional, default: 1)
 """
 
 import sys
@@ -20,7 +20,7 @@ import requests
 from datetime import date
 from pathlib import Path
 
-# --- Načtení konfigurace ---
+# --- Load configuration ---
 
 def load_env():
     env_path = Path(__file__).parent / ".env"
@@ -38,9 +38,9 @@ TOKEN = os.environ.get("BLOG_API_TOKEN", "")
 ADMIN_URL = os.environ.get("BLOG_ADMIN_URL", "")
 
 if not TOKEN:
-    print("❌ Chybí BLOG_API_TOKEN v souboru .env")
-    print("   Vytvoř soubor .env s obsahem:")
-    print("   BLOG_API_TOKEN=tvůj_token_z_adminu")
+    print("❌ Missing BLOG_API_TOKEN v fileu .env")
+    print("   Create a .env file with:")
+    print("   BLOG_API_TOKEN=your_api_token")
     sys.exit(1)
 
 HEADERS = {
@@ -48,10 +48,10 @@ HEADERS = {
     "Content-Type": "application/json",
 }
 
-# --- Parsování frontmatter ---
+# --- Parse frontmatter ---
 
 def parse_frontmatter(text):
-    """Vytáhne YAML frontmatter a tělo článku."""
+    """Extract YAML frontmatter and article body."""
     if not text.startswith("---"):
         return {}, text
 
@@ -70,7 +70,7 @@ def parse_frontmatter(text):
             val = val.strip().strip('"').strip("'")
             meta[key.strip()] = val
 
-    # Převod typů
+    # Type conversion
     if "isFeatured" in meta:
         meta["isFeatured"] = meta["isFeatured"].lower() == "true"
     if "readTime" in meta:
@@ -81,19 +81,19 @@ def parse_frontmatter(text):
 
     return meta, body
 
-# --- Výpočet délky čtení ---
+# --- Reading time calculation ---
 
 def calculate_read_time(text):
-    """Počet slov děleno 200 slov/min, zaokrouhleno nahoru."""
+    """Word count divided by 200 wpm, rounded up."""
     words = len(re.findall(r'\w+', text))
     return max(1, math.ceil(words / 200))
 
-# --- Generování slugu ---
+# --- Generating slugu ---
 
 def slugify(text):
-    """Převede název na URL-friendly slug."""
+    """Convert name to URL-friendly slug."""
     text = text.lower()
-    # Česká diakritika
+    # Czech diakritika
     replacements = {
         'á':'a','č':'c','ď':'d','é':'e','ě':'e','í':'i','ň':'n',
         'ó':'o','ř':'r','š':'s','ť':'t','ú':'u','ů':'u','ý':'y','ž':'z',
@@ -105,10 +105,10 @@ def slugify(text):
     text = re.sub(r'-+', '-', text)
     return text[:80]
 
-# --- Zjištění ID autora a kategorie ---
+# --- Resolve author and category IDs ---
 
 def get_author_id(name_or_id):
-    """Najde ID autora podle jména nebo vrátí číslo přímo."""
+    """Find author ID by name or return number directly."""
     if str(name_or_id).isdigit():
         return int(name_or_id)
 
@@ -123,11 +123,11 @@ def get_author_id(name_or_id):
     except Exception:
         pass
 
-    # Výchozí: první autor
-    return int(os.environ.get("CYRCID_AUTHOR_ID", "1"))
+    # Default: first author
+    return int(os.environ.get("AUTHOR_ID", "1"))
 
 def get_category_id(name_or_id):
-    """Najde ID kategorie podle názvu nebo vrátí číslo přímo."""
+    """Find category ID by name or return number directly."""
     if str(name_or_id).isdigit():
         return int(name_or_id)
 
@@ -145,10 +145,10 @@ def get_category_id(name_or_id):
 
     return None
 
-# --- Zjištění schématu API (jaká pole POST přijímá) ---
+# --- Detect API schema (which fields POST accepts) ---
 
 def detect_content_field():
-    """Zjistí, jak se jmenuje pole pro obsah článku (content/body/text)."""
+    """Detect the field name for article content (content/body/text)."""
     try:
         r = requests.options(f"{API_BASE}/blog/posts/", headers=HEADERS, timeout=10)
         if r.status_code == 200:
@@ -159,9 +159,9 @@ def detect_content_field():
                     return field
     except Exception:
         pass
-    return "content"  # výchozí předpoklad
+    return "content"  # default assumption
 
-# --- Hlavní publikační funkce ---
+# --- Main publish function ---
 
 def publish(filepath):
     path = Path(filepath)
@@ -172,12 +172,12 @@ def publish(filepath):
     text = path.read_text(encoding="utf-8")
     meta, body = parse_frontmatter(text)
 
-    print(f"\n📄 Nahrávám: {path.name}")
+    print(f"\n📄 Uploading: {path.name}")
 
-    # Povinná pole
+    # Required fields
     title = meta.get("title", "")
     if not title:
-        print("❌ Chybí 'title' ve frontmatter")
+        print("❌ Missing 'title' ve frontmatter")
         sys.exit(1)
 
     slug = meta.get("slug") or slugify(title)
@@ -188,21 +188,21 @@ def publish(filepath):
 
     # Kategorie a autor
     category_raw = meta.get("category", "DPP")
-    author_raw = meta.get("author", os.environ.get("CYRCID_AUTHOR_ID", "1"))
+    author_raw = meta.get("author", os.environ.get("AUTHOR_ID", "1"))
 
-    print(f"   Zjišťuji kategorii '{category_raw}'...")
+    print(f"   Looking up category '{category_raw}'...")
     category_id = get_category_id(category_raw)
     if not category_id:
-        print(f"   ⚠️  Kategorie '{category_raw}' nenalezena, zkouším odeslat jako string")
+        print(f"   ⚠️  Category not found, trying to send as string")
 
-    print(f"   Zjišťuji autora '{author_raw}'...")
+    print(f"   Looking up author '{author_raw}'...")
     author_id = get_author_id(str(author_raw))
 
     # Pole pro obsah
     content_field = detect_content_field()
     print(f"   Pole pro obsah: '{content_field}'")
 
-    # Sestavení payloadu
+    # Build payload
     payload = {
         "slug": slug,
         "title": title,
@@ -211,7 +211,7 @@ def publish(filepath):
         "date": pub_date,
         "readTime": read_time,
         "isFeatured": is_featured,
-        "isPublished": False,  # vždy draft
+        "isPublished": False,  # always draft
         "author": author_id,
     }
 
@@ -221,9 +221,9 @@ def publish(filepath):
     else:
         payload["category"] = category_raw
 
-    print(f"\n   Odesílám POST na {API_BASE}/blog/posts/")
+    print(f"\n   Sending POST to {API_BASE}/blog/posts/")
     print(f"   Slug: {slug}")
-    print(f"   Read time: {read_time} min | Délka: {len(body.split())} slov")
+    print(f"   Read time: {read_time} min | Length: {len(body.split())} words")
 
     try:
         r = requests.post(
@@ -233,17 +233,17 @@ def publish(filepath):
             timeout=30,
         )
     except requests.exceptions.ConnectionError:
-        print("❌ Nepodařilo se připojit k API.")
-        print("   Zkontroluj, zda máš zapnutý Tailscale (VPN).")
+        print("❌ Failed to connect to API.")
+        print("   Check if Tailscale (VPN) is running.")
         sys.exit(1)
 
     if r.status_code in (200, 201):
         data = r.json()
         post_id = data.get("id", "?")
-        print(f"\n✅ Draft vytvořen!")
+        print(f"\n✅ Draft created!")
         print(f"   Admin URL: {ADMIN_URL}/{post_id}/change/")
 
-        # --- Generování hero image ---
+        # --- Generating hero image ---
         try:
             from generate_blog_image import generate_blog_image
             image_path = generate_blog_image(
@@ -252,30 +252,30 @@ def publish(filepath):
                 excerpt=excerpt,
                 title_cs=meta.get("title_cs", ""),
             )
-            print(f"\n🖼  Hero image uložen: {image_path}")
+            print(f"\n🖼  Hero image saved: {image_path}")
             image_checklist = f"   3. Nahraj hero image z: {image_path}"
         except Exception as e:
-            print(f"\n⚠️  Generování obrázku selhalo: {e}")
-            image_checklist = "   3. Nahraj featured image ručně"
+            print(f"\n⚠️  Generating image selhalo: {e}")
+            image_checklist = "   3. Upload featured image manually"
 
-        print(f"\n📋 Co teď udělat:")
-        print(f"   1. Otevři: {ADMIN_URL}/{post_id}/change/")
-        print(f"   2. Zkontroluj text a případně uprav")
+        print(f"\n📋 What to do next:")
+        print(f"   1. Open: {ADMIN_URL}/{post_id}/change/")
+        print(f"   2. Review and edit text")
         print(image_checklist)
-        print(f"   4. Přepni 'Is published' na ON")
-        print(f"   5. Klikni Save — článek je live 🚀")
+        print(f"   4. Set 'Is published' to ON")
+        print(f"   5. Klikni Save — article je live 🚀")
     else:
-        print(f"\n❌ Chyba {r.status_code}")
+        print(f"\n❌ Error {r.status_code}")
         print(f"   Response: {r.text[:1000]}")
         print(f"\n   Payload (pro debug):")
-        payload_debug = {k: v if k != content_field else f"[{len(str(v))} znaků]" for k, v in payload.items()}
+        payload_debug = {k: v if k != content_field else f"[{len(str(v))} chars]" for k, v in payload.items()}
         print(f"   {json.dumps(payload_debug, ensure_ascii=False, indent=2)}")
         sys.exit(1)
 
-# --- Spuštění ---
+# --- Entry point ---
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Použití: python publish.py cesta/k/article.md")
+        print("Usage: python publish.py path/k/article.md")
         sys.exit(1)
     publish(sys.argv[1])

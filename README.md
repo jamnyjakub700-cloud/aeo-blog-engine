@@ -43,7 +43,7 @@ Ready-to-use markdown template following the AEO methodology. Shows the exact st
 ## Setup
 
 ```bash
-git clone https://github.com/jamnyjakub700-cloud/aeo-blog-engine.git
+git clone https://github.com/YOUR_USERNAME/aeo-blog-engine.git
 cd aeo-blog-engine
 
 pip install -r requirements.txt
@@ -107,9 +107,11 @@ Traditional SEO optimizes for PageRank and SERP positions. But with ChatGPT, Per
 
 The AEO methodology in this toolkit is based on production use across 15+ published articles with measured AI search visibility improvements.
 
-## Author
-
 **Jakub Jamny** — AI automation specialist
 
 - [LinkedIn](https://www.linkedin.com/in/jakub-jamn%C3%BD-3a0410246)
 - [Website](https://jakubjamny.com)
+
+## License
+
+MIT

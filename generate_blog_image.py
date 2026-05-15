@@ -2,21 +2,21 @@
 """
 generate_blog_image.py — Blog Hero Image Generator
 
-Generuje featured image pro blog článek (1920×1080, 16:9).
-Sdílí vizuální DNA s create_post.py: Ideogram pozadí, adaptive overlay,
+Generates featured image for blog article (1920x1080, 16:9).
+Shares visual DNA with create_post.py: Ideogram background, adaptive overlay.
 Bebas Neue + DM Sans, cream paleta, cyrcID logo.
 
-Každý článek dostane:
-  - Unikátní texturu látky (rotace 4–5 variant na kategorii, určeno hashem titulku)
-  - Titulek článku přes obrázek (Bebas Neue, cream, vlevo dole, auto-wrap)
+Each article gets:
+  - Unique background texture (rotated 4-5 variants per category, determined by title hash)
+  - Article title overlaid (Bebas Neue, cream, bottom-left, auto-wrap)
   - Kategorii nad titulkem (spaced caps, warm accent)
   - Divider linku
-  - Logo vpravo nahoře
+  - Logo top-right
 
-Použití:
-    python generate_blog_image.py --title "Jak připravit DPP audit" \
+Usage:
+    python generate_blog_image.py --title "How to prepare a compliance audit" \
                                   --category "DPP" \
-                                  --excerpt "Od 2028 musí každý textilní výrobek..."
+                                  --excerpt "By 2028 every product must..."
 """
 
 import sys
@@ -30,7 +30,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageStat
 
 # ═══════════════════════════════════════════════════════════════
-#  KONFIGURACE
+#  CONFIGURATION
 # ═══════════════════════════════════════════════════════════════
 
 def load_env():
@@ -73,7 +73,7 @@ COLOR_CREAM       = (245, 240, 232)
 COLOR_WARM_ACCENT = (210, 195, 160)
 
 PAD        = 64    # okraj od kraje obrazovky
-LABEL_GAP  = 7     # mezery mezi písmeny kategorie
+LABEL_GAP  = 7     # letter spacing for category label
 LOGO_WIDTH = 88
 
 
@@ -101,11 +101,11 @@ def load_dm_light(size): return _load_font(FONT_DM_LIGHT, size, _FALLBACK_LIGHT)
 
 
 # ═══════════════════════════════════════════════════════════════
-#  IDEOGRAM PROMPTY — rotace látek
+#  IDEOGRAM PROMPTS — texture rotation
 #
-#  Každá kategorie má 4–5 variant textury.
-#  Výběr varianty = hash(title) % počet_variant
-#  → každý článek dostane jiné pozadí, ale vždy sedí k tématu
+#  Each category has 4-5 texture variants.
+#  Variant selection = hash(title) % variant_count
+#  → each article gets a different background that matches its topic
 # ═══════════════════════════════════════════════════════════════
 
 _NEGATIVE = (
@@ -186,7 +186,7 @@ _PROMPT_GROUPS = {
         "raking light revealing cellular texture, "
         "landscape format, no text, editorial material study",
 
-        "Macro shot of bouclé yarn knit, warm oatmeal and cream loops, "
+        "Macro shot of textured yarn knit, warm oatmeal and cream loops, "
         "soft overhead light, irregular looped texture prominent, "
         "landscape format, no text, editorial fashion",
     ],
@@ -340,23 +340,23 @@ _PROMPT_GROUPS = {
 }
 
 _KEYWORD_MAP = [
-    ("regulation", ["regulation", "regulac", "espr", "compliance", "zákon",
-                    "nařízení", "povinnost", "deadline", "legislation", "legislativ"]),
-    ("sustainability", ["sustainable", "circular", "recycled", "recykl", "organic",
-                        "upcycl", "udržiteln", "environment", "carbon", "footprint",
-                        "emise", "lca", "životní prostředí"]),
-    ("supply_chain", ["supply chain", "dodavatel", "řetěz", "blockchain",
-                      "traceability", "transparenc", "tracking", "sledov",
+    ("regulation", ["regulation", "compliance",
+                    "deadline", "legislation", "requirement", "mandate"]),
+    ("sustainability", ["sustainable", "circular", "recycled", "organic",
+                        "upcycl", "environment", "carbon", "footprint",
+                        "emissions", "lca"]),
+    ("supply_chain", ["supply chain", "blockchain",
+                      "traceability", "transparenc", "tracking", 
                       "data", "infrastructure"]),
-    ("dpp", ["qr", "label", "štítek", "scan", "tag", "digital product passport",
-             "digitální produktový pas", "dpp", "identifier"]),
-    ("implementation", ["audit", "implementac", "krok", "guide", "návod",
-                        "proces", "checklist", "preparation", "příprava", "how to"]),
+    ("dpp", ["qr", "label", "scan", "tag", "digital product passport",
+             "identifier", "product data"]),
+    ("implementation", ["audit", "step", "guide",
+                        "process", "checklist", "preparation", "how to"]),
 ]
 
 
 def _title_hash(title: str) -> int:
-    """Deterministický hash titulku pro výběr varianty — stejný titulek = stejný obrázek."""
+    """Deterministic title hash for variant selection — same title = same image."""
     return int(hashlib.md5(title.lower().encode()).hexdigest(), 16)
 
 
@@ -370,20 +370,20 @@ def build_blog_prompt(title: str, category: str, excerpt: str = "") -> str:
 
     variants = _PROMPT_GROUPS[group]
     chosen   = variants[_title_hash(title) % len(variants)]
-    print(f"   Skupina: {group} | Varianta {_title_hash(title) % len(variants) + 1}/{len(variants)}")
+    print(f"   Group: {group} | Variant {_title_hash(title) % len(variants) + 1}/{len(variants)}")
     return chosen
 
 
 # ═══════════════════════════════════════════════════════════════
-#  GENEROVÁNÍ POZADÍ
+#  BACKGROUND GENERATION
 # ═══════════════════════════════════════════════════════════════
 
 def generate_background(prompt: str) -> Image.Image:
     if not IDEOGRAM_API_KEY:
-        print("  ⚠️  Chybí IDEOGRAM_API_KEY v .env — generuji tmavý placeholder")
+        print("  ⚠️  Missing IDEOGRAM_API_KEY in .env — generating dark placeholder")
         return Image.new("RGB", IMAGE_SIZE, (32, 30, 28))
 
-    print(f"  Volám Ideogram API...")
+    print(f"  Calling Ideogram API...")
     resp = requests.post(
         IDEOGRAM_URL,
         headers={"Api-Key": IDEOGRAM_API_KEY, "Content-Type": "application/json"},
@@ -405,7 +405,7 @@ def generate_background(prompt: str) -> Image.Image:
 
 
 # ═══════════════════════════════════════════════════════════════
-#  OVERLAY — o něco tmavší než dřív, text musí být čitelný
+#  OVERLAY — slightly darker for text readability
 # ═══════════════════════════════════════════════════════════════
 
 def apply_overlay(img: Image.Image) -> tuple:
@@ -437,7 +437,7 @@ def load_logo():
         ratio = LOGO_WIDTH / logo.width
         return logo.resize((LOGO_WIDTH, int(logo.height * ratio)), Image.LANCZOS)
     except (OSError, FileNotFoundError):
-        print(f"  ⚠️  Logo nenalezeno: {LOGO_PATH}")
+        print(f"  ⚠️  Logo not found: {LOGO_PATH}")
         return None
 
 
@@ -453,13 +453,13 @@ def place_logo(img: Image.Image, logo) -> Image.Image:
 #  TITULEK — auto-wrap + auto-size
 # ═══════════════════════════════════════════════════════════════
 
-MAX_TITLE_WIDTH = int(IMAGE_SIZE[0] * 0.58)  # titulek zabírá max 58% šířky (levá polovina)
+MAX_TITLE_WIDTH = int(IMAGE_SIZE[0] * 0.58)  # title occupies max 58% width (left half)
 MAX_FONT_SIZE   = 130
 MIN_FONT_SIZE   = 52
 
 
 def _wrap_title(draw, title: str, font) -> list[str]:
-    """Rozdělí titulek na řádky tak, aby se vešel do MAX_TITLE_WIDTH."""
+    """Split title into lines that fit within MAX_TITLE_WIDTH."""
     words = title.split()
     lines, current = [], []
     for word in words:
@@ -472,11 +472,11 @@ def _wrap_title(draw, title: str, font) -> list[str]:
             current = [word]
     if current:
         lines.append(" ".join(current))
-    return lines[:4]  # max 4 řádky
+    return lines[:4]  # max 4 lines
 
 
 def _auto_size_title(draw, title: str) -> tuple:
-    """Najde největší font, při kterém se všechna slova vejdou."""
+    """Find the largest font where all words fit."""
     for size in range(MAX_FONT_SIZE, MIN_FONT_SIZE - 1, -4):
         font  = load_bebas(size)
         lines = _wrap_title(draw, title, font)
@@ -500,17 +500,17 @@ def draw_spaced_text(draw, pos, text, font, fill, gap=LABEL_GAP):
 def render_blog_hero(base_img: Image.Image, title: str,
                      category: str, logo) -> Image.Image:
     """
-    Layout (vlevo dole, směrem nahoru):
+    Layout (bottom-left, upward):
       [metadata strip]
       [KATEGORIE  spaced caps warm accent]
       [── divider line ──]
-      [TITULEK ČLÁNKU  Bebas Neue cream  2–3 řádky auto-sized]
-    Logo: vpravo nahoře.
+      [ARTICLE TITLE  Bebas Neue cream  2-3 lines auto-sized]
+    Logo: top-right.
     """
     img  = base_img.copy().convert("RGBA")
     draw = ImageDraw.Draw(img, "RGBA")
 
-    # ── Metadata strip (úplně dole) ──
+    # ── Metadata strip (bottom) ──
     font_meta = load_dm_light(18)
     meta_y    = IMAGE_SIZE[1] - PAD + 4
     brand_w   = draw.textlength("CYRCID.COM", font=font_meta)
@@ -519,17 +519,17 @@ def render_blog_hero(base_img: Image.Image, title: str,
 
     # ── Kategorie (nad titulkem) ──
     font_cat = load_dm_light(22)
-    # pozici kategorie spočítáme zpětně od spodního okraje
+    # calculate category position from bottom edge
 
-    # ── Titulek — auto-size ──
+    # ── Title — auto-size ──
     font_title, lines, font_size = _auto_size_title(draw, title)
-    line_h    = int(font_size * 0.88)          # tight leading (stejně jako create_post.py)
+    line_h    = int(font_size * 0.88)          # tight leading (same as create_post.py)
     total_h   = len(lines) * line_h
     meta_zone = 52                              # prostor pro metadata strip
     title_bottom = IMAGE_SIZE[1] - PAD - meta_zone
     title_top    = title_bottom - total_h
 
-    # Vykresli řádky titulku
+    # Draw title lines
     y = title_top
     for i, line in enumerate(lines):
         fill = (*COLOR_CREAM, 245) if i == 0 else (*COLOR_WARM_ACCENT, 230)
@@ -560,8 +560,8 @@ def render_blog_hero(base_img: Image.Image, title: str,
 
 def generate_blog_image(title: str, category: str = "DPP",
                         excerpt: str = "", title_cs: str = "") -> str:
-    print(f"\n🖼  Generuji hero image...")
-    print(f"   Článek: {title[:70]}")
+    print(f"\n🖼  Generating hero image...")
+    print(f"   Article: {title[:70]}")
 
     slug     = re.sub(r'[^a-z0-9]+', '-', title.lower())[:50].strip('-')
     prompt   = build_blog_prompt(title, category, excerpt)
@@ -577,15 +577,15 @@ def generate_blog_image(title: str, category: str = "DPP",
     final_en = render_blog_hero(comp, title, category, logo)
     filepath_en = os.path.join(OUTPUT_DIR, f"blog_{date.today()}_{slug}.jpg")
     final_en.save(filepath_en, "JPEG", quality=92, optimize=True)
-    print(f"   ✅ EN uloženo: {filepath_en}")
+    print(f"   ✅ EN saved: {filepath_en}")
 
-    # CS verze (pokud je zadán český titulek)
+    # CS version (if Czech title provided)
     filepath_cs = None
     if title_cs:
         final_cs = render_blog_hero(comp, title_cs, category, logo)
         filepath_cs = os.path.join(OUTPUT_DIR, f"blog_{date.today()}_{slug}_cs.jpg")
         final_cs.save(filepath_cs, "JPEG", quality=92, optimize=True)
-        print(f"   ✅ CS uloženo: {filepath_cs}")
+        print(f"   ✅ CS saved: {filepath_cs}")
 
     return filepath_en if not filepath_cs else f"{filepath_en}\n{filepath_cs}"
 
@@ -596,14 +596,14 @@ def generate_blog_image(title: str, category: str = "DPP",
 
 def main():
     p = argparse.ArgumentParser(description="Blog Hero Image Generator")
-    p.add_argument("--title",    required=True, help="Anglický titulek článku")
-    p.add_argument("--title-cs", default="",    help="Český titulek článku (generuje druhou verzi obrázku)")
+    p.add_argument("--title",    required=True, help="Article title (English)")
+    p.add_argument("--title-cs", default="",    help="Czech title článku (generuje druhou verzi image)")
     p.add_argument("--category", default="DPP")
     p.add_argument("--excerpt",  default="")
     args = p.parse_args()
     path = generate_blog_image(args.title, args.category, args.excerpt, args.title_cs)
     print(f"\n{'='*60}")
-    print(f"  Hotovo: {path}")
+    print(f"  Done: {path}")
     print(f"  Nahraj do Cyrcid Adminu → Featured Image")
     print(f"{'='*60}\n")
 
