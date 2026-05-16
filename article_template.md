@@ -1,89 +1,89 @@
 ---
-title: "Max 60 znaků — obsahuje primární klíčové slovo"
-slug: "url-friendly-slug-bez-diakritiky"
-category: "DPP"
-excerpt: "Max. 160 znaků. První věta shrnutí — klíčový fakt nebo příslib hodnoty pro čtenáře."
-meta_description: "Max 155 znaků. Konkrétní číslo nebo příslib hodnoty. Ne obecný popis."
+title: "Max 60 characters — include primary keyword"
+slug: "url-friendly-slug-no-special-chars"
+category: "Compliance"
+excerpt: "Max 160 characters. First sentence summary — key fact or value promise for the reader."
+meta_description: "Max 155 characters. Include a specific number or value promise. Not a generic description."
 isFeatured: false
-lang: "cs"
+lang: "en"
 readTime: 10
 date: "2026-04-21"
 ---
 
-[Konkrétní číslo nebo zjištění hned v první větě — ne obecný kontext.] [Druhá věta rozšiřuje zjištění nebo přidává kontrast.] Firmy v textilním průmyslu čelí [přesný popis problému]. Tento článek vysvětluje [co se čtenář dozví] a jak [praktický přínos].
+[Specific number or finding in the very first sentence — not generic context.] [Second sentence expands the finding or adds contrast.] Companies in the industry face [precise problem description]. This article explains [what the reader will learn] and how [practical benefit].
 
 ---
 
-## Co je [téma] a proč na něm záleží?
+## What is [topic] and why does it matter?
 
-[Přímá definice v první větě.] [ESPR/DPP kontext — jedna věta.] [Proč je to relevantní právě teď — konkrétní deadline nebo číslo.]
+[Direct definition in the first sentence.] [Regulatory context — one sentence.] [Why it is relevant right now — specific deadline or number.]
 
-> **Klíčové zjištění:** [1 věta shrnující hlavní point sekce s konkrétním číslem]
+> **Key finding:** [1 sentence summarizing the main point of this section with a specific number]
 
-## Koho se [téma] týká?
+## Who does [topic] affect?
 
-[Přímá odpověď — typy firem, velikosti, trhy.] Povinnost se vztahuje na všechny textilní výrobky prodávané na trhu EU bez ohledu na velikost firmy.
+[Direct answer — company types, sizes, markets.] The obligation applies to all products sold on the EU market regardless of company size.
 
-| Typ subjektu | Povinnost od | Poznámka |
+| Entity Type | Mandatory from | Note |
 |---|---|---|
-| Výrobci v EU | 2028 | Povinný DPP pro každý SKU |
-| Importéři do EU | 2028 | Odpovědnost za DPP dodavatele |
-| Maloobchodníci | 2028 | Musí zajistit dostupnost DPP |
+| EU Manufacturers | 2028 | Mandatory passport for every SKU |
+| EU Importers | 2028 | Responsibility for supplier compliance |
+| Retailers | 2028 | Must ensure passport availability |
 
-## Jak [implementace/proces] funguje krok za krokem?
+## How does [implementation/process] work step by step?
 
-### Krok 1: [název]
-[Co přesně udělat, ne proč.]
+### Step 1: [name]
+[What exactly to do, not why.]
 
-### Krok 2: [název]
-[Konkrétní akce.]
+### Step 2: [name]
+[Specific action.]
 
-### Krok 3: [název]
-[Výsledek kroku.]
+### Step 3: [name]
+[Result of this step.]
 
-> **Klíčové zjištění:** [1 věta shrnující hlavní point sekce]
-
----
-**Chcete vědět, jak si stojí váš produkt?** [Provedeme bezplatný screening of your product →](https://example.com/contact)
----
-
-## Kolik [implementace] stojí a co vyžaduje?
-
-[Přímá odpověď s čísly pokud jsou dostupná.] Náklady závisí na [faktorech]. Průměrná firma potřebuje [časový odhad] přípravy.
-
-## Nejčastější chyby při [téma]
-
-1. **[Chyba 1]** — [proč k ní dochází a jak se jí vyhnout]
-2. **[Chyba 2]** — [proč k ní dochází a jak se jí vyhnout]
-3. **[Chyba 3]** — [proč k ní dochází a jak se jí vyhnout]
-
-> **Klíčové zjištění:** [1 věta shrnující hlavní point sekce]
+> **Key finding:** [1 sentence summarizing the main point of this section]
 
 ---
+**Want to know where your product stands?** [Get a free product screening →](https://example.com/contact)
+---
 
-## Nejčastější otázky (FAQ)
+## How much does [implementation] cost and what does it require?
 
-### Co přesně musí DPP obsahovat pro textilní výrobky?
-[Přímá odpověď 2–4 věty.]
+[Direct answer with numbers if available.] Costs depend on [factors]. The average company needs [time estimate] of preparation.
 
-### Od kdy je DPP povinný?
-Od 1. ledna 2028 musí každý textilní výrobek prodávaný na trhu EU obsahovat digitální produktový pas dostupný přes QR kód nebo RFID.
+## Most common mistakes with [topic]
 
-### Jaké sankce hrozí za nesplnění ESPR požadavků?
-[Přímá odpověď.]
+1. **[Mistake 1]** — [why it happens and how to avoid it]
+2. **[Mistake 2]** — [why it happens and how to avoid it]
+3. **[Mistake 3]** — [why it happens and how to avoid it]
 
-### Jak dlouho trvá implementace DPP systému?
-[Přímá odpověď s konkrétním odhadem.]
-
-### Musím mít DPP i pro výrobky vyrobené mimo EU?
-[Přímá odpověď.]
+> **Key finding:** [1 sentence summarizing the main point of this section]
 
 ---
 
-## Co udělat jako další krok?
+## Frequently Asked Questions (FAQ)
 
-Každý produkt má svoji stopu. Otázka je, jestli víte, odkud pochází.
+### What exactly must a product passport contain?
+[Direct answer 2-4 sentences.]
 
-1. **Vyzkoušejte naši screeningovou kalkulačku** — první odhad za necelou minutu. [Spustit screening →](https://example.com/calculator)
-2. **Přečtěte si [název souvisejícího článku]** — [interní odkaz na relevantní článek]
-3. **Domluvte si bezplatnou konzultaci** — první screening report je zdarma. [Contact us →](https://example.com/contact)
+### When does the product passport become mandatory?
+From January 1, 2028, every product sold on the EU market must include a digital product passport accessible via QR code or RFID.
+
+### What penalties exist for non-compliance?
+[Direct answer.]
+
+### How long does system implementation take?
+[Direct answer with a specific estimate.]
+
+### Do I need a passport for products manufactured outside the EU?
+[Direct answer.]
+
+---
+
+## What to do next?
+
+Every product has a footprint. The question is whether you know where it comes from.
+
+1. **Try our screening calculator** — first estimate in under a minute. [Start screening →](https://example.com/calculator)
+2. **Read [related article title]** — [internal link to relevant article]
+3. **Schedule a free consultation** — first screening report is free. [Contact us →](https://example.com/contact)

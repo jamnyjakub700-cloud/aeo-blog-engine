@@ -4,13 +4,13 @@ generate_blog_image.py — Blog Hero Image Generator
 
 Generates featured image for blog article (1920x1080, 16:9).
 Shares visual DNA with create_post.py: Ideogram background, adaptive overlay.
-Bebas Neue + DM Sans, cream paleta, cyrcID logo.
+Bebas Neue + DM Sans, cream palette, brand watermark.
 
 Each article gets:
   - Unique background texture (rotated 4-5 variants per category, determined by title hash)
   - Article title overlaid (Bebas Neue, cream, bottom-left, auto-wrap)
-  - Kategorii nad titulkem (spaced caps, warm accent)
-  - Divider linku
+  - Category label above title (spaced caps, warm accent)
+  - Divider line
   - Logo top-right
 
 Usage:
@@ -513,11 +513,12 @@ def render_blog_hero(base_img: Image.Image, title: str,
     # ── Metadata strip (bottom) ──
     font_meta = load_dm_light(18)
     meta_y    = IMAGE_SIZE[1] - PAD + 4
-    brand_w   = draw.textlength("CYRCID.COM", font=font_meta)
+    brand_text = os.getenv("BRAND_WATERMARK", "YOURBRAND.COM")
+    brand_w   = draw.textlength(brand_text, font=font_meta)
     draw.text((IMAGE_SIZE[0] - PAD - brand_w, meta_y),
-              "CYRCID.COM", font=font_meta, fill=(*COLOR_CREAM, 55))
+              brand_text, font=font_meta, fill=(*COLOR_CREAM, 55))
 
-    # ── Kategorie (nad titulkem) ──
+    # ── Category (above title) ──
     font_cat = load_dm_light(22)
     # calculate category position from bottom edge
 
@@ -597,7 +598,7 @@ def generate_blog_image(title: str, category: str = "DPP",
 def main():
     p = argparse.ArgumentParser(description="Blog Hero Image Generator")
     p.add_argument("--title",    required=True, help="Article title (English)")
-    p.add_argument("--title-cs", default="",    help="Czech title článku (generuje druhou verzi image)")
+    p.add_argument("--title-cs", default="",    help="Czech title (generates a second localized image variant)")
     p.add_argument("--category", default="DPP")
     p.add_argument("--excerpt",  default="")
     args = p.parse_args()
